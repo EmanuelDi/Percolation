@@ -1,7 +1,6 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
-
     private final boolean[][] grid;
     private final WeightedQuickUnionUF uf;
     private int openSites;
@@ -17,12 +16,21 @@ public class Percolation {
         grid = new boolean[n][n];
         uf = new WeightedQuickUnionUF(n * n + 2);
         openSites = 0;
-
     }
 
     private void validate(int row, int col) {
-        if (row < 0 || row > n - 1 || col < 0 || col > n - 1) {
-            throw new IllegalArgumentException("The number must be between 0 and " + (n - 1));
+
+        if (row - 1 < 0) {
+            throw new IllegalArgumentException("index out of bounds row chico" + row);
+        }
+        if (row - 1 > n) {
+            throw new IllegalArgumentException("index out of bounds row grande" + row);
+        }
+        if (col - 1 < 0) {
+            throw new IllegalArgumentException("index out of bounds col chico" + col);
+        }
+        if (col - 1 > n) {
+            throw new IllegalArgumentException("index out of bounds col grande" + col);
         }
     }
 
@@ -33,32 +41,31 @@ public class Percolation {
 
         if (!isOpen(row, col)) {
 
-            grid[row][col] = true;
+            grid[row - 1][col - 1] = true;
             openSites++;
-            int siteIndex = row * n + col;
+            int siteIndex = (row - 1) * n + (col - 1);
 
-            if (row == 0){
+            if (row - 1 == 0) {
                 uf.union(siteIndex, n * n);
             }
-            if (row == n - 1) {
+            if (row - 1 == n - 1) {
                 uf.union(siteIndex, n * n + 1);
-                //System.out.println("aja");
             }
 
-            if ( row > 0 && isOpen(row - 1, col)) {
-                uf.union(siteIndex, (row -1) * n + col);
+            if (row - 1 > 0 && isOpen(row, col)) {
+                uf.union(siteIndex, ((row - 1) - 1) * n + (col - 1));
             }
 
-            if ( row < n - 1 && isOpen(row + 1, col) ) {
-                uf.union(siteIndex, (row + 1) * n + col);
+            if (row - 1 < n - 1 && isOpen(row + 1, col)) {
+                uf.union(siteIndex, ((row - 1) + 1) * n + (col - 1));
             }
 
-            if ( col > 0 && isOpen(row, col -1) ) {
-                uf.union(siteIndex, row * n + col - 1);
+            if (col - 1 > 0 && isOpen(row, col - 1)) {
+                uf.union(siteIndex, (row - 1) * n + (col - 1) - 1);
             }
 
-            if (col < n - 1 && isOpen(row, col + 1 )) {
-                uf.union(siteIndex, row * n + col + 1);
+            if (col - 1 < n - 1 && isOpen(row, col + 1)) {
+                uf.union(siteIndex, (row - 1) * n + (col - 1) + 1);
             }
         }
     }
@@ -66,24 +73,30 @@ public class Percolation {
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
         validate(row, col);
+        row = row - 1;
+        col = col - 1;
         return grid[row][col];
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
         validate(row, col);
-        return isOpen(row, col) && uf.find(row * n + col) == uf.find(n * n);
+
+        return isOpen(row, col) && uf.find((row - 1) * n + (col - 1)) == uf.find(n * n);
     }
 
     // returns the number of open sites
-    public int numberOfOpenSites() { return openSites; }
+    public int numberOfOpenSites() {
+        return openSites;
+    }
 
     // does the system percolate?
-    public boolean percolates() { return uf.find(n * n) == uf.find(n * n + 1); }
+    public boolean percolates() {
+        return uf.find(n * n) == uf.find(n * n + 1);
+    }
 
     // test client (optional)
     public static void main(String[] args) {
-
 
     }
 }
